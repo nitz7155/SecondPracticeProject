@@ -1,4 +1,4 @@
-package com.practice.second;
+package com.practice.second.dto;
 
 import com.practice.second.domain.Article;
 import lombok.AllArgsConstructor;
