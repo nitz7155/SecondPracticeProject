@@ -3,7 +3,9 @@ package com.practice.second.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.second.domain.Article;
 import com.practice.second.dto.AddArticleRequest;
+import com.practice.second.dto.UpdateArticleRequest;
 import com.practice.second.repository.BlogRepository;
+import org.hibernate.sql.Update;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,12 +153,12 @@ class BlogApiControllerTest {
         // given
         final String url = "/api/articles/{id}";
         final String title = "title";
-        final String content = "title";
+        final String content = "content";
 
-        Article savedArticle = Article.builder()
+        Article savedArticle = blogRepository.save(Article.builder()
                 .title(title)
                 .content(content)
-                .build();
+                .build());
 
         // when
         mockMvc.perform(delete(url, savedArticle.getId())
@@ -166,5 +168,36 @@ class BlogApiControllerTest {
         // then
         List<Article> articles = blogRepository.findAll();
         assertThat(articles).isEmpty();
+    }
+
+    @DisplayName("updateArticle: 블로그 글 수정에 성공한다.")
+    @Test
+    public void updateArticle() throws Exception {
+        // given
+        final String url = "/api/articles/{id}";
+        final String content = "테스트 글";
+        final String title = "테스트 제목";
+
+        // @Transactional이 붙어 있어서 자동으로 테이블에 insert 한다.
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title).content(content).build());
+
+        final String newContent = "새 글";
+        final String newTitle = "새 제목";
+
+        UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(put(url, savedArticle.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        resultActions.andExpect(status().isOk());
+
+        Article article = blogRepository.findById(savedArticle.getId()).get();
+
+        assertThat(article.getTitle()).isEqualTo(newTitle);
+        assertThat(article.getContent()).isEqualTo(newContent);
     }
 }
