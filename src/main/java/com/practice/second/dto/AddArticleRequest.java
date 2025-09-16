@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // 모든 파라미터 생성자
 @Getter
 public class AddArticleRequest {
-
     private String title;
-
     private String content;
 
     public Article toEntity() {
