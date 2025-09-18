@@ -7,3 +7,4 @@
 - Thymeleaf
 - SpringWeb
 - PostgreSQL Driver
+- SpringSecurity
